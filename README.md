@@ -85,11 +85,49 @@ if a session only has one user then all events of that session must belong to th
 missing userIds and many sessions have more than one user. There is no obvious reason to think that those events are needed
 for the purpose of this project and they will therefore be excluded in the rest of this analysis, leaving us with 278154 events.
 
+For interest we can also look at the top ranking songs and artists. For our sample dataset this is how our top 5 would look like:
+1. You're The One - Dwight Yoakam
+2. Undo - Björk
+3. Revelry - Kings Of Leon
+4. Sehr kosmisch - Harmonia
+5. Horn Concerto No. 4 in E flat K495: II. Romance (Andante cantabile) - Barry Tuckwell/Academy of St Martin-in-the-Fields/Sir Neville Marriner
+
+For curiosity you can listen to the top ranking song [here](https://open.spotify.com/track/451F5TM60tR5ec1gOGr1JQ?si=5bUGCoYVSzKj6dgYXCEC6g)
+
+and the top artists are:
+
+1. Kings Of Leon
+2. Coldplay
+3. Florence + The Machine
+4. Dwight Yoakam
+5. Björk
+
+As we will see the top artist and song will not be very relevant in our analysis since we will index the songs and artists by popularity.
+
+Finally we can look at how many users share sessions:
+
+|Users per session|Share of sessions [%]|
+|---------------|-----|
+|              1| 79.8|
+|              3|  10.5|
+|              4|   3.4|
+|              2|  6.3|'
+
+Most of our users do not share sessions with other users (80 %). However a significant amount of sessions are shared.
 ### Exploratory Visualization
 The picture below shows categorical features with less that 25 categories.
 
-![alt text](pictures/categorical_features_barplot.png)
+![categorical_features](pictures/categorical_features_barplot.png)
 
 Most of our events are paid (80%), there are more events by women than by men and most of the events (>80%) are listening to songs 
 (page:NextSong, method:PUT and status:200)
+
+The only numeric feature is length. Other features can be of numeric type but represent a category or a sequential number.
+The histogram below shows the distribution of the _length_ feature. There is a minimum length of  0.8s and a maximum value
+of 3025s. Those values are clearly outliers in a distribution were the percentiles 0.25 and 0.75 are respectively 205s and 
+258s with a median of 222s.
+
+![length_hist](pictures/length_hist.png)
+
+
 ## Conclusion
