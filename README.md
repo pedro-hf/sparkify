@@ -1,5 +1,5 @@
 # Sparkify
-
+!['lr_feat_imp'](pictures/logo.png)
 ## Project Definition
 ### Project Overview
 A common problem in service providing companies (e.g. Spotify) is the prediction of 
@@ -281,8 +281,8 @@ sets have comparable rations of positive labels(churn).
 that much data in this sample 3 folds in the cross evaluator will suffice. The following hyperparameters will be tuned:
 * Logistic regression:
     * maxIter, [10, 100, 500]
-    * regParam ( $\lambda$ ), [0, 0.4, 0.6, 1]
-    * elasticNetParam (( $\alpha$ )), [0, 0.5, 1]
+    * regParam (lambda), [0, 0.4, 0.6, 1]
+    * elasticNetParam (alpha), [0, 0.5, 1]
     * standardization , [True, False]
     * aggregationDepth, [2, 3, 4]
 * Random Forest Classifier:
@@ -295,7 +295,71 @@ that much data in this sample 3 folds in the cross evaluator will suffice. The f
 
 ## Results and Conclusions
 
+These are the final results of the tuned models:
+
+| Model                          | True Positives | False Positives | True Negatives | False Negatives | Accuracy | Recall | Precision | F1|
+|--------------------------------|----------------|-----------------|----------------|-----------------|----------|--------|-----------|---|
+|Logistic Regression (LG)             |9|13|38|7|0.70|0.56|0.41|0.47|
+|Random Forest Classifier (RFC)       |4|0|51|12|0.82|0.25|1.0|0.4|
+|Multilayer Perceptron Classifier (MPC)|10|11|40|6|0.75|0.62|0.48|0.54|
+
+As we can see from the results none of the models are particularly good. The maximum F1-score was obtained with the perceptron classifier (MPC) with 11 layers .
+Logistic regression (LR) seems to perform similarly to the MPC scoring lower both on recall and precision. The Random Forest classifier (RFC) 
+however was extremely conservative, it only predicted 4 of the 16 churned users. 
+
+Unfortunately, we cannot determine feature importance of the MPC but we can look at the both the LG and the RFC to gain some insight into which 
+features seem to matter more for churn.
+
+The picture below shows the top and bottom 5 coefficients of the LR.
+
+ !['lr_feat_imp'](pictures/lr_feat_imp.png)
+
+Interestingly, the state features of CO, AR and DC rank highest. This might suggest that users in those states tend to churn more than other states.
+It is risky to draw those conclusions since there are 44 states and 255 users, there are very few users per state which might affect our model.
+If the size of our dataset was the size of the sample here investigated we would study the posibility of removing these features, however this work is
+meat to also be applied to larger data sets where these features might become relevant again. 
+
+If we ignore the state feature we find that the strongest indicators of churn are ThumbsDown and Ubuntu. It seems quite reasonable to think that people that
+usually dislike songs will end up terminating their subscription. The Ubuntu feature sugests that users with Ubuntu are more likely to terminate their subscriptions.
+
+On the other hand, the features that indicate that the users will remain customers are: AddFriend and Totaltime, both very reasonable indicators. This might motivate further
+investigations into the social interactions between users and churn. Total time tells us that users that have been clients for a long time will likely remain that way and that there
+is a larger risk with new users.
 
 
+We can now move on to the RFC, the picture below shows the feature importance of the top 10 :
+
+ !['lr_feat_imp'](pictures/rf_feat_imp.png)
+
+As we can see, it relies heavily on total time. Again, this might be due to the small size of our data set. 
+
+The other top ranked features are : events per Day and Thumbs Down which are not very surprising. Active users will probably not
+discontinue the service.
+
+### Conclusions and further work
+
+The work here presented shows how features can be engineered from event logs to create data to be used in machine learning 
+models to predict customer churn. We defined customer churn as to wheter a user visited the customer Cancellation page.
+We used a sample dataset in a local pyspark cluster that can be easily scaled to much large datasets (big data).
+From the three ML models trained the Multilayer Perceptron Classifier (MPC) scored highest in the F1 score. One of the drawbacks of MPC 
+is the difficulty in explaining the prediction in relation to the features, however we can look at the logistic regressor and the 
+Random forest classifier to get some insight as to what features seem to weigh heavier on the prediction of churn.
+The logistic regressor top features are related to states, the thumbs down event, the add friend event, the total time and the Ubuntu os.
+The random forest classifier top feature is by far total time followed far behind by events per day, thumbs down and artist rank.
+
+The size of our data set is very small, only 255 users have been used to train with cross-validation and test the models, this affects the
+ability of the models to generalize and predict, the scores we obtained were rather low, 0.54 F1-score in the MPC. The choice of model
+will in the end be chosen on the details of the measures enforced on tentative churn users. Costly measures false positives will motivate the use
+of models with high precision (random forest) while costly false negatives will lead to models that maximize recall (MPC or LR).
+
+Aditional approaches to the problem could be investiged, these are some posibilities:
+
+* Create time based features : features for the last n days
+* Rolling average features: create window operations back in time for each event and labels of those windows based on churn events forward in time
+* Redefine the problem as a regression problem by defining churn as number of days until cancellation.
+* investigate other models: decision trees, boosted trees and SVM
+
+At any rate predicting churn seems to be no easy task even with large data sets (example links?). Creating a reliable model 
+is a complex job of problem understanding, feature engineering and model tuning. 
 
 
